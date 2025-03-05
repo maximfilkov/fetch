@@ -25,3 +25,6 @@ target/
 
 # Ignore generated maven files
 dependency-reduced-pom.xml
+src/main/resources/META-INF/
+src/main/resources/archetype-resources/
+
