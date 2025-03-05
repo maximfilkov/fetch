@@ -19,35 +19,22 @@ public class ConfigReader {
     }
 
     /**
-     * Retrieves the value of a specified property key.
-     *
-     * @param key the property key to retrieve.
-     * @return the value of the property if found, otherwise {@code null}.
+     * Overrides the properties for testing purposes.
+     * @param newProperties The test properties to use.
      */
+    public static void overrideProperties(Properties newProperties) {
+        properties.clear();
+        properties.putAll(newProperties);
+    }
+
     public static String getProperty(String key) {
         return properties.getProperty(key);
     }
 
-    /**
-     * Retrieves a property value and replaces placeholders with specified values.
-     * <p>
-     * Example usage:
-     * <pre>
-     *     String url = ConfigReader.getFormattedProperty("api_url",
-     *                     "{base_url}", "https://example.com",
-     *                     "{api_key}", "123456");
-     * </pre>
-     *
-     * @param key          the property key to retrieve.
-     * @param replacements an array of placeholder-value pairs to be replaced within the property value.
-     *                     Must be in the format: {@code "{placeholder1}", "value1", "{placeholder2}", "value2", ...}
-     * @return the formatted property value with placeholders replaced.
-     * @throws IllegalArgumentException if an odd number of replacement arguments is provided.
-     */
     public static String getFormattedProperty(String key, String... replacements) {
         String value = properties.getProperty(key);
         if (value == null) {
-            return null; // Return null if the property is missing.
+            return null;
         }
 
         for (int i = 0; i < replacements.length; i += 2) {
