@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fetch.config.ConfigReader;
 import com.fetch.exceptions.GeolocationException;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -17,9 +15,6 @@ import java.util.Objects;
  * for a given city/state or ZIP code by making HTTP requests to the API.
  */
 public class GeolocationService {
-    private static final String API_KEY = "f897a99d971b5eef57be6fafa0d83239";
-    private static final String BASE_URL = ConfigReader.getProperty("base_url");
-
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
 
@@ -30,6 +25,11 @@ public class GeolocationService {
     public GeolocationService() {
         this.client = new OkHttpClient();
         this.objectMapper = new ObjectMapper();
+    }
+
+    public GeolocationService(OkHttpClient client, ObjectMapper objectMapper) {
+        this.client = client;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -43,19 +43,22 @@ public class GeolocationService {
      * @throws GeolocationException if the request fails or the response cannot be processed.
      */
     public String fetchLocationData(String location) {
-        if (BASE_URL == null) {
-            throw new GeolocationException("BASE_URL is not configured properly.");
+        String baseUrl = ConfigReader.getProperty("base_url");
+        String apiKey = ConfigReader.getProperty("api_key");
+
+        if (baseUrl == null || apiKey == null) {
+            throw new GeolocationException("BASE_URL or API_KEY is not configured properly.");
         }
 
         String url = location.matches("\\d{5}")
                 ? ConfigReader.getFormattedProperty("zip_endpoint",
-                "{base_url}", BASE_URL,
+                "{base_url}", baseUrl,
                 "{zip}", location,
-                "{api_key}", API_KEY)
+                "{api_key}", apiKey)
                 : ConfigReader.getFormattedProperty("direct_endpoint",
-                "{base_url}", BASE_URL,
+                "{base_url}", baseUrl,
                 "{location}", location,
-                "{api_key}", API_KEY);
+                "{api_key}", apiKey);
 
         if (url == null || url.isBlank()) {
             throw new GeolocationException("Invalid API endpoint configuration.");
