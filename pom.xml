@@ -7,38 +7,29 @@
   <artifactId>Fetch</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Fetch Geolocation CLI</name>
-  <url>http://maven.apache.org</url>
 
   <properties>
     <java.version>11</java.version>
-    <spring-boot.version>2.7.17</spring-boot.version>
     <picocli.version>4.7.3</picocli.version>
     <jackson.version>2.15.0</jackson.version>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <okhttp.version>4.11.0</okhttp.version>
     <mockito.version>4.11.0</mockito.version>
+    <junit5.version>5.10.0</junit5.version>
   </properties>
 
   <dependencies>
-    <!-- Spring Boot Starter -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-      <version>${spring-boot.version}</version>
-    </dependency>
-
     <!-- Picocli for CLI support -->
     <dependency>
       <groupId>info.picocli</groupId>
-      <artifactId>picocli-spring-boot-starter</artifactId>
+      <artifactId>picocli</artifactId>
       <version>${picocli.version}</version>
     </dependency>
 
-    <!-- Spring Boot Web for REST API calls -->
+    <!-- OkHttp for HTTP Requests -->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <version>${spring-boot.version}</version>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>${okhttp.version}</version>
     </dependency>
 
     <!-- Jackson for JSON Parsing -->
@@ -50,9 +41,9 @@
 
     <!-- JUnit for Testing -->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <version>${spring-boot.version}</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit5.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -67,13 +58,6 @@
 
   <build>
     <plugins>
-      <!-- Spring Boot Maven Plugin -->
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${spring-boot.version}</version>
-      </plugin>
-
       <!-- Compiler Plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -99,7 +83,7 @@
             <configuration>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>com.fetch.GeolocationApplication</mainClass>
+                  <mainClass>com.fetch.GeolocationCLI</mainClass>
                 </transformer>
               </transformers>
             </configuration>
