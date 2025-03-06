@@ -1,8 +1,10 @@
 package com.fetch;
 
-import com.fetch.exceptions.GeolocationException;
+import com.fetch.config.ConfigReader;
 import com.fetch.service.GeolocationService;
 import picocli.CommandLine;
+
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -19,9 +21,18 @@ import java.util.concurrent.Callable;
 public class GeolocationCLI implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0..*", description = "Location names or zip codes")
-    private String[] locations; // Automatically injected with Picocli
+    private List<String> locations; // Automatically injected with Picocli
 
     private final GeolocationService geolocationService = new GeolocationService();
+    private final int maxLocations;
+
+    /**
+     * Constructor initializes max locations limit from config.
+     */
+    public GeolocationCLI() {
+        String maxLocationsConfig = ConfigReader.getProperty("max_locations");
+        this.maxLocations = (maxLocationsConfig != null) ? Integer.parseInt(maxLocationsConfig) : 10;
+    }
 
     /**
      * Processes the command-line inputs and fetches geolocation data for each provided location.
@@ -30,8 +41,14 @@ public class GeolocationCLI implements Callable<Integer> {
      */
     @Override
     public Integer call() {
-        if (locations == null || locations.length == 0) {
+        if (locations == null || locations.isEmpty()) {
             System.err.println("Error: Please provide at least one location.");
+            return 1;
+        }
+
+        // Enforce the maximum allowed locations
+        if (locations.size() > maxLocations) {
+            System.err.printf("Error: Too many locations provided. Maximum allowed is %d.%n", maxLocations);
             return 1;
         }
 
@@ -40,7 +57,7 @@ public class GeolocationCLI implements Callable<Integer> {
         for (String location : locations) {
             try {
                 System.out.println(geolocationService.fetchLocationData(location));
-            } catch (GeolocationException e) {
+            } catch (Exception e) {
                 System.err.println("Error: " + e.getMessage());
                 hasError = true;
             }

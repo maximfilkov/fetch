@@ -96,4 +96,19 @@ class GeolocationCLITest {
         assertTrue(outContent.toString().contains("Input: Madison, WI → Location: Madison, Lat: 43.074761, Lon: -89.3837613"));
         assertTrue(errContent.toString().contains("Error: No results found for InvalidCity, ZZ"));
     }
+
+    @Test
+    @DisplayName("Should return error when too many locations are provided")
+    void testTooManyLocationsProvided() {
+        String[] locations = {
+                "New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ",
+                "Philadelphia, PA", "San Antonio, TX", "San Diego, CA", "Dallas, TX", "San Jose, CA",
+                "ExtraLocation"  // 11th location, exceeding limit
+        };
+
+        int exitCode = commandLine.execute(locations);
+
+        assertEquals(1, exitCode);
+        assertTrue(errContent.toString().contains("Error: Too many locations provided."));
+    }
 }
