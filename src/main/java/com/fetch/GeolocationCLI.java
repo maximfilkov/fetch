@@ -1,10 +1,11 @@
 package com.fetch;
 
 import com.fetch.config.ConfigReader;
+import com.fetch.exceptions.GeolocationException;
 import com.fetch.service.GeolocationService;
 import picocli.CommandLine;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
@@ -24,6 +25,7 @@ public class GeolocationCLI implements Callable<Integer> {
     private List<String> locations; // Automatically injected with Picocli
 
     private final GeolocationService geolocationService = new GeolocationService();
+    private final Map<String, String> cache = new HashMap<>(); // Caching previous responses
     private final int maxLocations;
 
     /**
@@ -55,9 +57,17 @@ public class GeolocationCLI implements Callable<Integer> {
         boolean hasError = false; // Track if any errors occurred
 
         for (String location : locations) {
+            if (cache.containsKey(location)) {
+                // Use Cached Result Instead of API Call
+                System.out.println(cache.get(location));
+                continue;
+            }
+
             try {
-                System.out.println(geolocationService.fetchLocationData(location));
-            } catch (Exception e) {
+                String result = geolocationService.fetchLocationData(location);
+                cache.put(location, result); // Store in Cache
+                System.out.println(result);
+            } catch (GeolocationException e) {
                 System.err.println("Error: " + e.getMessage());
                 hasError = true;
             }

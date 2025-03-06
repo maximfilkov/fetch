@@ -2,18 +2,22 @@ package com.fetch;
 
 import com.fetch.exceptions.GeolocationException;
 import com.fetch.service.GeolocationService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import picocli.CommandLine;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GeolocationCLITest {
@@ -110,5 +114,20 @@ class GeolocationCLITest {
 
         assertEquals(1, exitCode);
         assertTrue(errContent.toString().contains("Error: Too many locations provided."));
+    }
+
+    @Test
+    @DisplayName("Should not make extra API calls for duplicate locations")
+    void testCachingMechanism() {
+        when(mockGeolocationService.fetchLocationData("New York, NY"))
+                .thenReturn("Input: New York, NY → Location: New York, Lat: 40.7128, Lon: -74.0060");
+
+        int exitCode = commandLine.execute("New York, NY", "Los Angeles, CA", "New York, NY");
+
+        assertEquals(0, exitCode);
+        assertTrue(outContent.toString().contains("Input: New York, NY → Location: New York, Lat: 40.7128, Lon: -74.0060"));
+
+        // Ensure API was called only **once** for "New York, NY"
+        verify(mockGeolocationService, times(1)).fetchLocationData("New York, NY");
     }
 }
