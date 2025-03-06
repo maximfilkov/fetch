@@ -105,12 +105,6 @@ Input: Chicago, IL → Location: Chicago, Lat: 41.8755616, Lon: -87.6244212
 
 ## Running Tests
 
-To run the test suite:
-
-```sh
-mvn test
-```
-
 Ensure the `API_KEY` environment variable is set before running tests:
 
 ```sh
@@ -129,3 +123,14 @@ For Windows (PowerShell):
 $env:API_KEY="mock-api-key"
 ```
 
+To run the test suite (unit tests only):
+
+```sh
+mvn test
+```
+
+Or to run all the tests (including integration ones):
+
+```sh
+mvn verify
+```
